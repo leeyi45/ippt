@@ -1,0 +1,19 @@
+{
+  "include": [
+    "src",
+    "vite.config.ts"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "verbatimModuleSyntax": true
+  }
+}
