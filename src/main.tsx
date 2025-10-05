@@ -3,6 +3,7 @@ import { useState } from 'react';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Badge from '@mui/material/Badge';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
@@ -12,11 +13,49 @@ import Switch from '@mui/material/Switch';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
+import TableFooter from '@mui/material/TableFooter';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 
 const MIN_RUN_MINUTES = 8;
 const MAX_RUN_MINUTES = 17;
+
+type PassType = 'fail' | 'pass' | 'pass-incentive' | 'silver' | 'gold' | 'gold+';
+
+interface IncentiveDisplayProps {
+  type: PassType;
+}
+
+function passTypeToString(type: PassType): string {
+  switch (type) {
+    case 'fail':
+      return 'FAIL';
+    case 'pass':
+    case 'pass-incentive':
+      return 'PASS';
+    case 'silver':
+      return 'SILVER';
+    case 'gold':
+    case 'gold+':
+      return 'GOLD';
+  }
+}
+
+function pointsToPassType(points: number): PassType {
+  if (points < 51) return 'fail';
+  if (points < 61) return 'pass';
+  if (points <= 71) return 'silver';
+}
+
+
+function IncentiveDisplay({
+  type
+}: IncentiveDisplayProps) {
+  return <Paper>
+    <Typography>{passTypeToString(type)}</Typography>
+  </Paper>;
+}
 
 interface NumericalSelectorProps {
   onChange?: (newValue: number) => void;
@@ -130,6 +169,7 @@ export default function MainComponent() {
 
   const runSelector = <Stack
     direction='row'
+    spacing={1}
   >
     <Button
       onClick={() => {
@@ -173,6 +213,7 @@ export default function MainComponent() {
 
   return <div>
     <Stack direction='column'>
+      <Typography component='h1'>IPPT Calculator</Typography>
       <Stack direction='row'>
         {ageSelector}
         {genderSelector}
@@ -219,7 +260,20 @@ export default function MainComponent() {
             <TableCell>0</TableCell>
           </TableRow>
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell>Total Points</TableCell>
+            <TableCell />
+            <TableCell />
+            <TableCell>0</TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
+      <Grid container>
+        <Grid>
+          <IncentiveDisplay />
+        </Grid>
+      </Grid>
     </Stack>
   </div>;
 }
