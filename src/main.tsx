@@ -12,12 +12,14 @@ import Popover from '@mui/material/Popover';
 import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
+import Tab from '@mui/material/Tab';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableFooter from '@mui/material/TableFooter';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { passTypeToReward, passTypeToString, pointsToNextTier, pointsToPassType } from './passType';
 import * as points from './points';
@@ -153,7 +155,62 @@ function EnhancedSelector({ value, onChange }: EnhancedSelectorProps) {
   return mainComponent;
 }
 
-export default function MainComponent() {
+interface TableDisplayProps {
+  values: number[][];
+}
+
+function PushupsTableDisplay({ values }: TableDisplayProps) {
+  return <Table>
+    <TableHead>
+      <TableRow>
+        <TableCell>Age Group</TableCell>
+        {...range(0, 14).map(i => <TableCell>{i}</TableCell>)}
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {
+        points.pushupsMale.map((row, i) => <TableRow>
+          <TableCell>{i}</TableCell>
+          {...row.map(each => <TableCell>{each}</TableCell>)}
+        </TableRow>)
+      }
+    </TableBody>
+  </Table>;
+}
+
+function SitupsTableDisplay() {
+  return <Table>
+    <TableHead>
+      <TableRow>
+        <TableCell>Age Group</TableCell>
+        {...range(0, 14).map(i => <TableCell>{i}</TableCell>)}
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {
+        points.pushupsMale.map((row, i) => <TableRow>
+          <TableCell>{i}</TableCell>
+          {...row.map(each => <TableCell>{each}</TableCell>)}
+        </TableRow>)
+      }
+    </TableBody>
+  </Table>;
+}
+
+function TablesDisplay() {
+  const [tabIndex, setTabIndex] = useState(0);
+
+  return <>
+    <Tabs onChange={(_, value) => setTabIndex(value)} value={tabIndex}>
+      <Tab value={0} label="Push Ups"/>
+      <Tab value={1} label="Sit Ups"/>
+      <Tab value={2} label="2.4 Run"/>
+    </Tabs>
+    {tabIndex === 0 && <PushupsTableDisplay />}
+  </>;
+}
+
+function CalculatorDisplay() {
   const [age, setAge] = useState(18);
   const ageGroup = points.getAgeGroup(age);
 
@@ -348,4 +405,17 @@ export default function MainComponent() {
       </Grid>
     </Stack>
   </div>;
+}
+
+export default function MainComponent() {
+  const [tabIndex, setTabIndex] = useState(0);
+
+  return <>
+    <Tabs onChange={(_, index) => setTabIndex(index)} value={tabIndex}>
+      <Tab value={0} label="Calculator"/>
+      <Tab value={1} label="Display Tables"/>
+    </Tabs>
+    {tabIndex === 0 && <CalculatorDisplay />}
+    {tabIndex === 1 && <TablesDisplay />}
+  </>;
 }

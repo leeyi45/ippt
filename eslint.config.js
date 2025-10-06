@@ -41,9 +41,10 @@ export default defineConfig(
       '@stylistic/arrow-spacing': 'warn',
       '@stylistic/block-spacing': 'warn',
       '@stylistic/brace-style': ['warn', '1tbs', { allowSingleLine: true }],
+      '@stylistic/eol-last': 'warn',
       '@stylistic/function-call-spacing': ['warn', 'never'],
       '@stylistic/function-paren-newline': ['warn', 'multiline-arguments'],
-      '@stylistic/indent': ['warn', 2],
+      '@stylistic/indent': ['warn', 2, { SwitchCase: 1 }],
       '@stylistic/keyword-spacing': 'warn',
       '@stylistic/member-delimiter-style': [
         'warn',
@@ -63,6 +64,10 @@ export default defineConfig(
         ignoreJSX: 'all',
         nestedBinaryExpressions: false,
       }],
+      '@stylistic/no-multi-spaces': ['warn', { ignoreEOLComments: true }],
+      '@stylistic/no-multiple-empty-lines': ['warn', { max: 1, maxEOF: 0 }],
+      '@stylistic/no-tabs': 'error',
+      '@stylistic/no-trailing-spaces': 'warn',
       '@stylistic/nonblock-statement-body-position': ['error', 'beside'],
       '@stylistic/object-curly-newline': ['warn', {
         ImportDeclaration: { multiline: true },
@@ -75,7 +80,8 @@ export default defineConfig(
         anonymous: 'always',
         asyncArrow: 'always',
         named: 'never'
-      }]
+      }],
+      '@stylistic/spaced-comment': ['warn', 'always'],
     }
   },
   {
@@ -95,7 +101,7 @@ export default defineConfig(
       '@typescript-eslint/no-import-type-side-effects': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/only-throw-error': 'error', 
+      '@typescript-eslint/only-throw-error': 'error',
       '@typescript-eslint/prefer-readonly': 'warn',
       '@typescript-eslint/require-await': 'error',
       '@typescript-eslint/return-await': ['error', 'in-try-catch']
