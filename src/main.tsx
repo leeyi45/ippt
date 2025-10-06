@@ -1,12 +1,14 @@
 import range from 'lodash/range';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Badge from '@mui/material/Badge';
 import Button from '@mui/material/Button';
+import Fade from '@mui/material/Fade';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
+import Popover from '@mui/material/Popover';
 import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
@@ -17,43 +19,27 @@ import TableFooter from '@mui/material/TableFooter';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-
-const MIN_RUN_MINUTES = 8;
-const MAX_RUN_MINUTES = 17;
-
-type PassType = 'fail' | 'pass' | 'pass-incentive' | 'silver' | 'gold' | 'gold+';
+import { passTypeToReward, passTypeToString, pointsToNextTier, pointsToPassType } from './passType';
+import * as points from './points';
 
 interface IncentiveDisplayProps {
-  type: PassType;
+  points: number;
 }
 
-function passTypeToString(type: PassType): string {
-  switch (type) {
-    case 'fail':
-      return 'FAIL';
-    case 'pass':
-    case 'pass-incentive':
-      return 'PASS';
-    case 'silver':
-      return 'SILVER';
-    case 'gold':
-    case 'gold+':
-      return 'GOLD';
-  }
-}
+function IncentiveDisplay({ points }: IncentiveDisplayProps) {
+  const type = pointsToPassType(points);
+  const [extra, nextTier] = pointsToNextTier(points);
 
-function pointsToPassType(points: number): PassType {
-  if (points < 51) return 'fail';
-  if (points < 61) return 'pass';
-  if (points <= 71) return 'silver';
-}
-
-
-function IncentiveDisplay({
-  type
-}: IncentiveDisplayProps) {
   return <Paper>
-    <Typography>{passTypeToString(type)}</Typography>
+    <div style={{ padding: '10px' }}>
+      <Typography>{passTypeToString(type)}</Typography>
+      <Typography>
+        Reward: ${passTypeToReward(type)}
+      </Typography>
+      <Typography>
+        {nextTier !== undefined && <p>{extra} points to {passTypeToString(nextTier)}</p>}
+      </Typography>
+    </div>
   </Paper>;
 }
 
@@ -97,74 +83,157 @@ function NumericalSelector({ min, max, value, onChange }: NumericalSelectorProps
   </Stack>;
 }
 
+interface EnhancedSelectorProps {
+  onChange: (newValue: boolean) => void;
+  value?: boolean;
+}
+
+function EnhancedSelector({ value, onChange }: EnhancedSelectorProps) {
+  const [hover, setHover] = useState(false);
+  const [popover, setPopover] = useState<null | HTMLElement>(null);
+  const divRef = useRef(null);
+
+  const mainComponent = <>
+    <Popover
+      open={popover !== null}
+      anchorEl={popover}
+      onClose={() => {
+        setHover(false);
+        setPopover(null);
+      }}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center'
+      }}
+    >
+      <div style={{ padding: '10px' }}>
+        Test
+      </div>
+    </Popover>
+    <Paper
+      ref={divRef}
+    >
+      <div style={{ padding: '5px' }}>
+        <Stack
+          direction='column'
+          alignItems='center'
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+        >
+          <Typography component='h3'>
+            Enhanced Mode
+          </Typography>
+          <Switch
+            checked={value}
+            onChange={() => onChange(!value)}
+          />
+        </Stack>
+      </div>
+    </Paper>
+  </>;
+
+  if (hover) {
+    return <Badge
+      badgeContent={
+        <Fade in={hover} >
+          <IconButton
+            onClick={() => {
+              setPopover(divRef.current);
+            }}
+          >
+            <HelpOutlineIcon />
+          </IconButton>
+        </Fade>
+      }
+    >
+      {mainComponent}
+    </Badge>;
+  }
+
+  return mainComponent;
+}
+
 export default function MainComponent() {
   const [age, setAge] = useState(18);
-  const [pushups, setPushups] = useState(30);
-  const [situps, setSitups] = useState(30);
+  const ageGroup = points.getAgeGroup(age);
+
+  const [isEnhanced, setEnhanced] = useState(false);
   const [gender, setGender] = useState<'male' | 'female'>('male');
+  const pushupsTable = gender === 'male' ? points.pushupsMale : points.pushupsFemale;
+  const situpsTable = gender === 'male' ? points.situpsMale : points.situpsFemale;
+
+  const [pushups, setPushups] = useState(30);
+  const pushupScore = points.getScore(pushupsTable, ageGroup, pushups);
+
+  const [situps, setSitups] = useState(30);
+  const situpScore = points.getScore(situpsTable, ageGroup, situps);
+
   const [runMinutes, setRunMinutes] = useState(12);
   const [runSeconds, setRunSeconds] = useState(10);
-  const [isEnhanced, setEnhanced] = useState(false);
+  const runScore = points.getRunScore(runMinutes, runSeconds, ageGroup, gender);
+  const nextRunScore = points.findNextRunPoint(runMinutes, runSeconds, ageGroup, gender);
+  const {
+    fastest: [minRunMins, minRunSecs],
+    slowest: [maxRunMins, maxRunSecs]
+  } = gender === 'male' ? points.runMaleLimits : points.runFemaleLimits;
+
+  const totalScore = situpScore + pushupScore + runScore;
 
   const genderSelector = <Paper>
-    <Stack
-      alignItems='center'
-      direction='column'
-      justifyContent='center'
-    >
-      Gender
+    <div style={{ padding: '5px' }}>
       <Stack
-        direction='row'
         alignItems='center'
+        direction='column'
+        justifyContent='center'
       >
-        Male
-        <Switch
-          checked={gender === 'female'}
-          onChange={() => {
-            if (gender === 'male') setGender('female');
-            else setGender('male');
-          }}
-        />
-        Female
+        <Typography component='h3'>
+          Gender
+        </Typography>
+        <Stack
+          direction='row'
+          alignItems='center'
+        >
+          <Typography component='p'>
+            Male
+          </Typography>
+          <Switch
+            checked={gender === 'female'}
+            onChange={() => {
+              if (gender === 'male') setGender('female');
+              else setGender('male');
+            }}
+          />
+          <Typography component='p'>
+            Female
+          </Typography>
+        </Stack>
       </Stack>
-    </Stack>
+    </div>
   </Paper>;
 
-  const enhancedSelector = <Badge
-    badgeContent={
-      <IconButton>
-        <HelpOutlineIcon />
-      </IconButton>
-    }
-  >
-    <Paper>
+  const enhancedSelector = <EnhancedSelector
+    value={isEnhanced}
+    onChange={setEnhanced}
+  />;
+
+  const ageSelector = <Paper>
+    <div style={{ padding: '5px' }}>
       <Stack
         direction='column'
         alignItems='center'
+        justifyContent='center'
       >
-        Enhanced Mode
-        <Switch
-          checked={isEnhanced}
-          onChange={() => setEnhanced(v => !v)}
+        <Typography component='h3'>
+          Age (Age Group {ageGroup + 1})
+        </Typography>
+        <NumericalSelector
+          value={age}
+          max={60}
+          min={18}
+          onChange={setAge}
         />
       </Stack>
-    </Paper>
-  </Badge>;
-
-  const ageSelector = <Paper>
-    <Stack
-      direction='column'
-      alignItems='center'
-      justifyContent='center'
-    >
-      Age
-      <NumericalSelector
-        value={age}
-        max={60}
-        min={18}
-        onChange={setAge}
-      />
-    </Stack>
+    </div>
   </Paper>;
 
   const runSelector = <Stack
@@ -180,7 +249,7 @@ export default function MainComponent() {
           setRunSeconds(v => v + 10);
         }
       }}
-      disabled={runMinutes===MAX_RUN_MINUTES && runSeconds === 50}
+      disabled={runMinutes===maxRunMins && runSeconds === maxRunSecs}
     >
       +10s
     </Button>
@@ -188,7 +257,7 @@ export default function MainComponent() {
       value={runMinutes}
       onChange={event => setRunMinutes(event.target.value)}
     >
-      {range(MIN_RUN_MINUTES, MAX_RUN_MINUTES + 1).map(i => <MenuItem value={i}>{i} Mins</MenuItem>)}
+      {range(minRunMins, maxRunMins + 1).map(i => <MenuItem value={i}>{i} Mins</MenuItem>)}
     </Select>
     <Select
       value={runSeconds}
@@ -197,7 +266,7 @@ export default function MainComponent() {
       {range(0, 60, 10).map(i => <MenuItem value={i}>{i} Seconds</MenuItem>)}
     </Select>
     <Button
-      disabled={runMinutes === MIN_RUN_MINUTES && runSeconds === 0}
+      disabled={runMinutes === minRunMins && runSeconds === minRunSecs}
       onClick={() => {
         if (runSeconds === 0) {
           setRunMinutes(v => v - 1);
@@ -212,9 +281,12 @@ export default function MainComponent() {
   </Stack>;
 
   return <div>
-    <Stack direction='column'>
+    <Stack
+      direction='column'
+      spacing={1}
+    >
       <Typography component='h1'>IPPT Calculator</Typography>
-      <Stack direction='row'>
+      <Stack direction='row' spacing={1}>
         {ageSelector}
         {genderSelector}
         {enhancedSelector}
@@ -238,8 +310,8 @@ export default function MainComponent() {
                 onChange={setPushups}
               />
             </TableCell>
-            <TableCell>0</TableCell>
-            <TableCell>0</TableCell>
+            <TableCell>{pushupScore}</TableCell>
+            <TableCell>{points.findNextPoint(pushupsTable, ageGroup, pushups)}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Sit-Ups</TableCell>
@@ -250,28 +322,28 @@ export default function MainComponent() {
                 onChange={setSitups}
               />
             </TableCell>
-            <TableCell>0</TableCell>
-            <TableCell>0</TableCell>
+            <TableCell>{situpScore}</TableCell>
+            <TableCell>{points.findNextPoint(situpsTable, ageGroup, situps)}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>2.4km Run</TableCell>
             <TableCell>{runSelector}</TableCell>
-            <TableCell>0</TableCell>
-            <TableCell>0</TableCell>
+            <TableCell>{runScore}</TableCell>
+            <TableCell>{nextRunScore && (<p>- {nextRunScore * 10}s</p>)}</TableCell>
           </TableRow>
         </TableBody>
         <TableFooter>
           <TableRow>
             <TableCell>Total Points</TableCell>
             <TableCell />
+            <TableCell>{totalScore}</TableCell>
             <TableCell />
-            <TableCell>0</TableCell>
           </TableRow>
         </TableFooter>
       </Table>
       <Grid container>
         <Grid>
-          <IncentiveDisplay />
+          <IncentiveDisplay points={totalScore}/>
         </Grid>
       </Grid>
     </Stack>
