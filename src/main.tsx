@@ -1,6 +1,7 @@
 import range from 'lodash/range';
 import { useRef, useState } from 'react';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { Tooltip } from '@mui/material';
 import Badge from '@mui/material/Badge';
 import Button from '@mui/material/Button';
 import Fade from '@mui/material/Fade';
@@ -21,8 +22,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
+import type { GridColDef } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid/DataGrid';
 import { passTypeToReward, passTypeToString, pointsToNextTier, pointsToPassType } from './passType';
 import * as points from './points';
+import type { Gender } from './types';
 
 interface IncentiveDisplayProps {
   points: number;
@@ -159,54 +163,106 @@ interface TableDisplayProps {
   values: number[][];
 }
 
-function PushupsTableDisplay({ values }: TableDisplayProps) {
-  return <Table>
-    <TableHead>
-      <TableRow>
-        <TableCell>Age Group</TableCell>
-        {...range(0, 14).map(i => <TableCell>{i}</TableCell>)}
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {
-        points.pushupsMale.map((row, i) => <TableRow>
-          <TableCell>{i}</TableCell>
-          {...row.map(each => <TableCell>{each}</TableCell>)}
-        </TableRow>)
+function TableDisplay({ values }: TableDisplayProps) {
+  const columns: GridColDef[] = [
+    {
+      field: 'reps',
+      align: 'center',
+      headerAlign: 'center',
+      headerName: 'Reps',
+      disableColumnMenu: true,
+    },
+    ...range(0, 14).map((ageGroup): GridColDef => {
+      let ageStr: string;
+
+      if (ageGroup === 0) {
+        ageStr = ' <22';
+      } else {
+        const ageStrMin = 22 + (ageGroup - 1) * 3;
+        const ageStrMax = ageStrMin + 2;
+        ageStr = `${ageStrMin}-${ageStrMax}`;
       }
-    </TableBody>
-  </Table>;
+
+      return {
+        field: `group${ageGroup}`,
+        renderHeader: (...params) => <Tooltip
+          title={`Age Group ${ageGroup + 1}`}
+          placement='top'
+        >
+          <Typography {...params} component='p'>
+            {ageStr}
+          </Typography>
+        </Tooltip>,
+        align: 'center',
+        headerAlign: 'center',
+        disableColumnMenu: true,
+        sortable: false,
+      };
+    })
+  ];
+
+  return <DataGrid
+    density='compact'
+    hideFooter
+    disableColumnResize
+    columns={columns}
+    rows={values.map((row, i) => {
+      const rowObj: Record<string, number> = {
+        id: i,
+        reps: i
+      };
+
+      row.forEach((value, i) => {
+        rowObj[`group${i}`] = value;
+      });
+
+      return rowObj;
+    })}
+  />;
 }
 
-function SitupsTableDisplay() {
-  return <Table>
-    <TableHead>
-      <TableRow>
-        <TableCell>Age Group</TableCell>
-        {...range(0, 14).map(i => <TableCell>{i}</TableCell>)}
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {
-        points.pushupsMale.map((row, i) => <TableRow>
-          <TableCell>{i}</TableCell>
-          {...row.map(each => <TableCell>{each}</TableCell>)}
-        </TableRow>)
-      }
-    </TableBody>
-  </Table>;
+enum TableType {
+  PUSHUPS = 'pushups',
+  SITUPS = 'situps',
+  RUN = 'run'
 }
 
 function TablesDisplay() {
-  const [tabIndex, setTabIndex] = useState(0);
+  const [tableType, setTableType] = useState<TableType>(TableType.PUSHUPS);
+  const [gender, setGender] = useState<Gender>('male');
+
+  let values: number[][];
+  switch (tableType) {
+    case TableType.PUSHUPS: {
+      values = gender === 'male' ? points.pushupsMale : points.pushupsFemale;
+      break;
+    }
+    case TableType.SITUPS: {
+      values = gender === 'male' ? points.situpsMale : points.situpsFemale;
+      break;
+    }
+    case TableType.RUN: {
+      values = gender === 'male' ? points.runMale : points.runFemale;
+      break;
+    }
+  }
 
   return <>
-    <Tabs onChange={(_, value) => setTabIndex(value)} value={tabIndex}>
-      <Tab value={0} label="Push Ups"/>
-      <Tab value={1} label="Sit Ups"/>
-      <Tab value={2} label="2.4 Run"/>
+    <Typography component='h1'>IPPT Scoring Tables</Typography>
+    <Stack direction='row' alignItems='center'>
+      <Typography>Male</Typography>
+      <Switch
+        checked={gender === 'female'}
+        onChange={() => setGender(gender === 'male' ? 'female' : 'male')}
+      />
+      <Typography>Female</Typography>
+    </Stack>
+    <Tabs onChange={(_, value) => setTableType(value)} value={tableType}>
+      <Tab value={TableType.PUSHUPS} label="Push Ups"/>
+      <Tab value={TableType.SITUPS} label="Sit Ups"/>
+      <Tab value={TableType.RUN} label="2.4 Run"/>
     </Tabs>
-    {tabIndex === 0 && <PushupsTableDisplay />}
+    {<TableDisplay values={values} />}
   </>;
 }
 
@@ -215,7 +271,7 @@ function CalculatorDisplay() {
   const ageGroup = points.getAgeGroup(age);
 
   const [isEnhanced, setEnhanced] = useState(false);
-  const [gender, setGender] = useState<'male' | 'female'>('male');
+  const [gender, setGender] = useState<Gender>('male');
   const pushupsTable = gender === 'male' ? points.pushupsMale : points.pushupsFemale;
   const situpsTable = gender === 'male' ? points.situpsMale : points.situpsFemale;
 
