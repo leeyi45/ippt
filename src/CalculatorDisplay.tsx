@@ -347,8 +347,12 @@ export default function CalculatorDisplay() {
   </Paper>;
 
   const settingsGrid = <Paper elevation={3}>
-    <div style={{ padding: '5px' }}>
-      <Grid container textAlign='center' rowGap={1}>
+    <div style={{ padding: '15px' }}>
+      <Grid
+        container
+        textAlign='center'
+        rowGap={1}
+      >
         {/* row 1 */}
         <Grid size={4}>
           <Typography fontSize={20}>Age (Age Group {ageGroup + 1})</Typography>
@@ -361,28 +365,33 @@ export default function CalculatorDisplay() {
         </Grid>
         {/* row 2 */}
         <Grid size={4}>
-          <Stack direction='row'>
-            <Button
-              disabled={age === 60}
-              onClick={() => setAge(age + 1)}
-            >
-              +1
-            </Button>
-            <Select
-              value={age}
-              onChange={event => setAge(event.target.value)}
-            >
-              {range(18, 61).map(i => <MenuItem value={i}>
-                {i}
-              </MenuItem>)}
-            </Select>
-            <Button
-              disabled={age === 18}
-              onClick={() => setAge(age - 1)}
-            >
-              -1
-            </Button>
-          </Stack>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center'
+          }}>
+            <Stack direction='row'>
+              <Button
+                disabled={age === 60}
+                onClick={() => setAge(age + 1)}
+              >
+                +1
+              </Button>
+              <Select
+                value={age}
+                onChange={event => setAge(event.target.value)}
+              >
+                {range(18, 61).map(i => <MenuItem value={i}>
+                  {i}
+                </MenuItem>)}
+              </Select>
+              <Button
+                disabled={age === 18}
+                onClick={() => setAge(age - 1)}
+              >
+                -1
+              </Button>
+            </Stack>
+          </div>
         </Grid>
         <Grid size={4}>
           <Select value={gender} onChange={event => setGender(event.target.value)}>
