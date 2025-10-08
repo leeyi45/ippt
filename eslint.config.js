@@ -1,6 +1,7 @@
 import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import stylistic from '@stylistic/eslint-plugin';
+import vitest from '@vitest/eslint-plugin';
 import * as importPlugin from 'eslint-plugin-import';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
@@ -14,6 +15,7 @@ export default defineConfig(
     },
     rules: {
       'import/first': 'warn',
+      'import/extensions': ['error', 'ignorePackages'],
       'import/newline-after-import': 'warn',
       // This rule is very time intensive.
       // 'import/no-cycle': 'error',
@@ -123,6 +125,36 @@ export default defineConfig(
       '@stylistic/jsx-indent-props': ['warn', 2],
       '@stylistic/jsx-props-no-multi-spaces': 'warn',
       '@stylistic/jsx-self-closing-comp': 'warn',
+    }
+  },
+  {
+    extends: [vitest.configs.recommended],
+    files: ['**/__tests__/*.test.{ts,tsx}'],
+    plugins: {
+      vitest
+    },
+    rules: {
+      'no-empty-pattern': 'off',
+      '@stylistic/quotes': [
+        'warn',
+        'single',
+        {
+          avoidEscape: true,
+          allowTemplateLiterals: 'always'
+        }
+      ],
+
+      'vitest/expect-expect': ['error', {
+        assertFunctionNames: ['expect*'],
+      }],
+      'vitest/no-alias-methods': 'off', // was 'error'
+      'vitest/no-conditional-expect': 'off', // was 'error'
+      'vitest/no-focused-tests': ['warn', { fixable: false }],
+      'vitest/prefer-describe-function-title': 'warn',
+      'vitest/require-top-level-describe': 'off', // was 'error'
+      'vitest/valid-describe-callback': 'off', // was 'error'
+      'vitest/valid-expect-in-promise': 'error',
+      'vitest/valid-title': ['error', { ignoreTypeOfDescribeName: true }],
     }
   }
 );

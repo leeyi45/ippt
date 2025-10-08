@@ -19,9 +19,9 @@ import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
-import { passTypeToReward, passTypeToString, pointsToNextTier, pointsToPassType } from './passType';
-import * as points from './points';
-import type { Gender } from './types';
+import { passTypeToReward, passTypeToString, pointsToNextTier, pointsToPassType } from './passType.ts';
+import * as points from './points.ts';
+import type { Gender } from './types.ts';
 
 interface IncentiveDisplayProps {
   pushups: number;

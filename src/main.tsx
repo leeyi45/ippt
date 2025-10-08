@@ -1,5 +1,5 @@
 import Typography from '@mui/material/Typography';
-import CalculatorDisplay from './CalculatorDisplay';
+import CalculatorDisplay from './CalculatorDisplay.tsx';
 
 export default function MainComponent() {
   return <div style={{
