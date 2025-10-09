@@ -85,40 +85,60 @@ export default function TablesDisplay({
             </TableRow>
           </TableHead>
           <TableBody>
-            {values.map((row, i) => <TableRow>
-              <TableCell
-                style={{ textAlign: 'right' }}
-              >
-                <strong>
-                  {tableType === points.TableType.RUN ? points.runGroupToString(i, gender) : `${i}`}
-                </strong>
-              </TableCell>
-            {...row.map((value, rowAge) => {
-              let backgroundStr: string;
-              if (rowAge === ageGroup) {
-                if (
-                  (tableType === points.TableType.PUSHUPS && i === pushupReps) ||
-                  (tableType === points.TableType.SITUPS && i === situpReps) ||
-                  (tableType === points.TableType.RUN && i === values.length - runScoreGroup)
-                ) {
-                  backgroundStr = '#DDDDFF';
-                } else {
-                  backgroundStr = '#EEEEFF';
-                }
-              } else {
-                backgroundStr = '#FFFFFF';
-              }
+            {values.map((row, i) => {
+              const isCorrectReps =
+                (tableType === points.TableType.PUSHUPS && i === pushupReps) ||
+                (tableType === points.TableType.SITUPS && i === situpReps) ||
+                (tableType === points.TableType.RUN && i === values.length - runScoreGroup);
 
-              return <TableCell
-                style={{
-                  textAlign: 'center',
-                  background: backgroundStr
-                }}
-              >
-                {value}
-              </TableCell>;
+              return <TableRow>
+                <TableCell
+                  style={{
+                    textAlign: 'right',
+                    backgroundColor: isCorrectReps ? '#EEEEFF' : '#FFFFFF'
+                  }}
+                >
+                  <strong>
+                    {tableType === points.TableType.RUN ? points.runGroupToString(i, gender) : `${i}`}
+                  </strong>
+                </TableCell>
+                {...row.map((value, rowAge) => {
+                  let selectValue = 0;
+                  if (rowAge === ageGroup) {
+                    selectValue++;
+                  }
+
+                  if (isCorrectReps) {
+                    selectValue++;
+                  }
+
+                  let backgroundStr: string;
+                  switch (selectValue) {
+                    case 1: {
+                      backgroundStr = '#EEEEFF';
+                      break;
+                    }
+                    case 2: {
+                      backgroundStr = '#DDDDFF';
+                      break;
+                    }
+                    default: {
+                      backgroundStr = '#FFFFFF';
+                      break;
+                    }
+                  }
+
+                  return <TableCell
+                    style={{
+                      textAlign: 'center',
+                      background: backgroundStr
+                    }}
+                  >
+                    {value}
+                  </TableCell>;
+                })}
+              </TableRow>;
             })}
-            </TableRow>)}
           </TableBody>
         </Table>
       </Stack>

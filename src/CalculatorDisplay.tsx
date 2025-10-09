@@ -108,9 +108,17 @@ function IncentiveDisplay({ pushups, situps, run }: IncentiveDisplayProps) {
   </Paper>;
 }
 
-function usePoints(initial: number, key: string, ageGroup: number, table: points.AgeGroupRange[]) {
+function useLocalStorage<T extends number | boolean | string>(initial: T, key: string) {
   const storedValue = localStorage.getItem(key);
-  const [value, setValue] = useState(storedValue === null ? initial : parseInt(storedValue));
+  const [value, setValue] = useState(storedValue !== null ? JSON.parse(storedValue) : initial);
+  return [value, v => {
+    setValue(v);
+    localStorage.setItem(key, JSON.stringify(v));
+  }] as [T, (v: T) => void];
+}
+
+function usePoints(initial: number, key: string, ageGroup: number, table: points.AgeGroupRange[]) {
+  const [value, setValue] = useLocalStorage(initial, key);
   const score = points.getScore(table, ageGroup, value);
   const nextScore = points.findNextPoint(table, ageGroup, value);
 
@@ -126,11 +134,11 @@ function usePoints(initial: number, key: string, ageGroup: number, table: points
 }
 
 export default function CalculatorDisplay() {
-  const [age, setAge] = useState(18);
+  const [age, setAge] = useLocalStorage<number>(18, 'age');
   const ageGroup = points.getAgeGroup(age);
 
   const [isEnhanced, setEnhanced] = useState(false);
-  const [gender, setGender] = useState<points.Gender>('male');
+  const [gender, setGender] = useLocalStorage<points.Gender>('male', 'gender');
   const pushupsTable = points.pointsTables[points.TableType.PUSHUPS][gender];
   const situpsTable = points.pointsTables[points.TableType.SITUPS][gender];
   const runTable = points.pointsTables[points.TableType.RUN][gender];
