@@ -1,5 +1,3 @@
-import type { Gender } from './types.ts';
-
 export const AGE_GROUPS = 14 as const;
 
 type TupleOfLength<T extends number, U = any, V extends U[] = []> =
@@ -7,7 +5,15 @@ type TupleOfLength<T extends number, U = any, V extends U[] = []> =
 
 export type AgeGroupRange = TupleOfLength<typeof AGE_GROUPS, number>;
 
-export const pushupsMale: TupleOfLength<61, AgeGroupRange> = [
+export type Gender = 'male' | 'female';
+
+export enum TableType {
+  PUSHUPS = 'pushups',
+  SITUPS = 'situps',
+  RUN = 'run'
+}
+
+const pushupsMale: TupleOfLength<61, AgeGroupRange> = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 0
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 1
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 2
@@ -71,7 +77,7 @@ export const pushupsMale: TupleOfLength<61, AgeGroupRange> = [
   [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25], // 60
 ];
 
-export const pushupsFemale: TupleOfLength<51, AgeGroupRange> = [
+const pushupsFemale: TupleOfLength<51, AgeGroupRange> = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 0
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 1
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 2
@@ -125,7 +131,7 @@ export const pushupsFemale: TupleOfLength<51, AgeGroupRange> = [
   [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25], // 50
 ];
 
-export const situpsMale: TupleOfLength<61, AgeGroupRange> = [
+const situpsMale: TupleOfLength<61, AgeGroupRange> = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 0
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 1
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 2
@@ -189,7 +195,7 @@ export const situpsMale: TupleOfLength<61, AgeGroupRange> = [
   [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25], // 60
 ];
 
-export const situpsFemale: TupleOfLength<53, AgeGroupRange> = [
+const situpsFemale: TupleOfLength<53, AgeGroupRange> = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 0
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 1
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 2
@@ -245,7 +251,7 @@ export const situpsFemale: TupleOfLength<53, AgeGroupRange> = [
   [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25], // 51
 ];
 
-export const runMale: TupleOfLength<60, AgeGroupRange> = [
+const runMale: TupleOfLength<60, AgeGroupRange> = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 18.20
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2], // 18.10
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4], // 18.00
@@ -308,7 +314,7 @@ export const runMale: TupleOfLength<60, AgeGroupRange> = [
   [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50], // 8.30
 ];
 
-export const runFemale: TupleOfLength<71, AgeGroupRange> = [
+const runFemale: TupleOfLength<71, AgeGroupRange> = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 6], // 21.40
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 6, 8], // 21.30
   [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 6, 8, 10], // 21.20
@@ -382,6 +388,21 @@ export const runFemale: TupleOfLength<71, AgeGroupRange> = [
   [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50], // 10.00
 ];
 
+export const pointsTables = {
+  [TableType.PUSHUPS]: {
+    male: pushupsMale,
+    female: pushupsFemale
+  },
+  [TableType.SITUPS]: {
+    male: situpsMale,
+    female: situpsFemale
+  },
+  [TableType.RUN]: {
+    male: runMale,
+    female: runFemale
+  }
+} satisfies Record<TableType, Record<Gender, AgeGroupRange[]>>;
+
 export interface RunLimits {
   fastest: [number, number];
   slowest: [number, number];
@@ -416,22 +437,9 @@ export function runGroupToString(runGroup: number, gender: Gender): string {
  */
 export function getAgeGroup(age: number): number {
   if (age >= 58) return 13;
-  if (age >= 55) return 12;
-  if (age >= 52) return 11;
-  if (age >= 49) return 10;
-  if (age >= 46) return 9;
+  if (age < 22) return 0;
 
-  if (age >= 43) return 8;
-  if (age >= 40) return 7;
-  if (age >= 37) return 6;
-  if (age >= 34) return 5;
-  if (age >= 31) return 4;
-
-  if (age >= 28) return 3;
-  if (age >= 25) return 2;
-  if (age >= 22) return 1;
-
-  return 0;
+  return Math.floor((age - 22) / 3) + 1;
 }
 
 /**

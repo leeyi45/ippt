@@ -2,13 +2,15 @@ import { describe, expect, it, test } from 'vitest';
 import * as points from '../points.ts';
 
 describe('Test point tables', () => {
-  const pointTables = [
-    points.pushupsFemale, points.pushupsMale,
-    points.situpsFemale, points.situpsMale,
-    points.runFemale, points.runMale
-  ];
+  const pointTables = Object.entries(points.pointsTables).flatMap(([tableType, { male, female }]) => [
+    [`${tableType} (Male)`, male],
+    [`${tableType} (Female)`, female],
+  ] as [
+    [string, number[][]],
+    [string, number[][]]
+  ]);
 
-  test.for(pointTables)('Table %#', table => {
+  test.for(pointTables)('%s', ([, table]) => {
     for (let i = 0; i < table.length; i++) {
       expect(table[i].length).toEqual(points.AGE_GROUPS);
 
@@ -29,6 +31,6 @@ describe('Test point tables', () => {
 
 describe(points.getScore, () => {
   it('returns max score if reps ≥ max', () => {
-    expect(points.getScore(points.pushupsMale, 0, 1000)).toEqual(25);
+    expect(points.getScore(points.pointsTables[points.TableType.PUSHUPS].male, 0, 1000)).toEqual(25);
   });
 });

@@ -19,9 +19,9 @@ import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
+import TablesDisplay from './TableDisplay.tsx';
 import { passTypeToReward, passTypeToString, pointsToNextTier, pointsToPassType } from './passType.ts';
 import * as points from './points.ts';
-import type { Gender } from './types.ts';
 
 interface IncentiveDisplayProps {
   pushups: number;
@@ -130,10 +130,10 @@ export default function CalculatorDisplay() {
   const ageGroup = points.getAgeGroup(age);
 
   const [isEnhanced, setEnhanced] = useState(false);
-  const [gender, setGender] = useState<Gender>('male');
-  const pushupsTable = gender === 'male' ? points.pushupsMale : points.pushupsFemale;
-  const situpsTable = gender === 'male' ? points.situpsMale : points.situpsFemale;
-  const runTable = gender === 'male' ? points.runMale : points.runFemale;
+  const [gender, setGender] = useState<points.Gender>('male');
+  const pushupsTable = points.pointsTables[points.TableType.PUSHUPS][gender];
+  const situpsTable = points.pointsTables[points.TableType.SITUPS][gender];
+  const runTable = points.pointsTables[points.TableType.RUN][gender];
 
   const {
     value: pushups,
@@ -425,6 +425,15 @@ export default function CalculatorDisplay() {
           pushups={pushupScore}
           situps={situpScore}
           run={runScore}
+        />
+      </Grid>
+      <Grid size={12}>
+        <TablesDisplay
+          runScoreGroup={runScoreGroup}
+          pushupReps={pushups}
+          situpReps={situps}
+          ageGroup={ageGroup}
+          gender={gender}
         />
       </Grid>
     </Grid>

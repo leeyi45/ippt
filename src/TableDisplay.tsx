@@ -1,123 +1,127 @@
+import capitalize from 'lodash/capitalize';
 import range from 'lodash/range';
 import { useState } from 'react';
 
+import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
 import Tab from '@mui/material/Tab';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import Tabs from '@mui/material/Tabs';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import type { GridColDef } from '@mui/x-data-grid';
-import { DataGrid } from '@mui/x-data-grid/DataGrid';
 
+import type { Gender } from './points.ts';
 import * as points from './points.ts';
-import type { Gender } from './types.ts';
 
-export interface TableDisplayProps {
-  values: number[][];
+export interface TablesDisplayProps {
+  runScoreGroup: number;
+  pushupReps: number;
+  situpReps: number;
+  ageGroup: number;
+  gender: Gender;
 }
 
-/**
- * React component for displaying a single score table
- */
-function TableDisplay({ values }: TableDisplayProps) {
-  const columns: GridColDef[] = [
-    {
-      field: 'reps',
-      align: 'center',
-      headerAlign: 'center',
-      headerName: 'Reps',
-      disableColumnMenu: true,
-    },
-    ...range(0, 14).map((ageGroup): GridColDef => {
-      let ageStr: string;
+export default function TablesDisplay({
+  ageGroup,
+  pushupReps,
+  situpReps,
+  runScoreGroup,
+  gender
+}: TablesDisplayProps) {
+  const [tableType, setTableType] = useState<points.TableType>(points.TableType.PUSHUPS);
 
-      if (ageGroup === 0) {
-        ageStr = ' <22';
-      } else {
-        const ageStrMin = 22 + (ageGroup - 1) * 3;
-        const ageStrMax = ageStrMin + 2;
-        ageStr = `${ageStrMin}-${ageStrMax}`;
-      }
+  const values = points.pointsTables[tableType][gender];
 
-      return {
-        field: `group${ageGroup}`,
-        renderHeader: (...params) => <Tooltip
-          title={`Age Group ${ageGroup + 1}`}
-          placement='top'
-        >
-          <Typography {...params} component='p'>
-            {ageStr}
-          </Typography>
-        </Tooltip>,
-        align: 'center',
-        headerAlign: 'center',
-        disableColumnMenu: true,
-        sortable: false,
-      };
-    })
-  ];
+  return <Paper elevation={3}>
+    <div style={{ padding: '10px' }}>
+      <Stack direction='column' alignItems='center' spacing={1}>
+        <Typography component='h2' fontSize={22}>
+          Scoring Table ({capitalize(gender)})
+        </Typography>
+        <Tabs onChange={(_, value) => setTableType(value)} value={tableType}>
+          <Tab value={points.TableType.PUSHUPS} label="Push Ups"/>
+          <Tab value={points.TableType.SITUPS} label="Sit Ups"/>
+          <Tab value={points.TableType.RUN} label="2.4 Run"/>
+        </Tabs>
+        <Table style={{
+          border: 'solid black 1px'
+        }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <Typography component='p'>
+                  {tableType === points.TableType.RUN ? 'Timing' : 'Reps'}
+                </Typography>
+              </TableCell>
+            {...range(0, 14).map(group => {
+              let ageStr: string;
 
-  return <DataGrid
-    density='compact'
-    hideFooter
-    disableColumnResize
-    columns={columns}
-    rows={values.map((row, i) => {
-      const rowObj: Record<string, number> = {
-        id: i,
-        reps: i
-      };
+              if (group === 0) {
+                ageStr = ' <22';
+              } else {
+                const ageStrMin = 22 + (group - 1) * 3;
+                const ageStrMax = ageStrMin + 2;
+                ageStr = `${ageStrMin}-${ageStrMax}`;
+              }
 
-      row.forEach((value, i) => {
-        rowObj[`group${i}`] = value;
-      });
+              return <TableCell style={{
+                backgroundColor: group === ageGroup ? '#EEEEFF' : '#FFFFFF',
+                textAlign: 'center'
+              }}>
+                <Tooltip
+                  title={`Age Group ${group + 1}`}
+                  placement='top'
+                >
+                  <Typography component='p'>
+                    {ageStr}
+                  </Typography>
+                </Tooltip>
+              </TableCell>;
+            })}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {values.map((row, i) => <TableRow>
+              <TableCell
+                style={{ textAlign: 'right' }}
+              >
+                <strong>
+                  {tableType === points.TableType.RUN ? points.runGroupToString(i, gender) : `${i}`}
+                </strong>
+              </TableCell>
+            {...row.map((value, rowAge) => {
+              let backgroundStr: string;
+              if (rowAge === ageGroup) {
+                if (
+                  (tableType === points.TableType.PUSHUPS && i === pushupReps) ||
+                  (tableType === points.TableType.SITUPS && i === situpReps) ||
+                  (tableType === points.TableType.RUN && i === values.length - runScoreGroup)
+                ) {
+                  backgroundStr = '#DDDDFF';
+                } else {
+                  backgroundStr = '#EEEEFF';
+                }
+              } else {
+                backgroundStr = '#FFFFFF';
+              }
 
-      return rowObj;
-    })}
-  />;
-}
-
-enum TableType {
-  PUSHUPS = 'pushups',
-  SITUPS = 'situps',
-  RUN = 'run'
-}
-
-export default function TablesDisplay() {
-  const [tableType, setTableType] = useState<TableType>(TableType.PUSHUPS);
-  const [gender, setGender] = useState<Gender>('male');
-
-  let values: number[][];
-  switch (tableType) {
-    case TableType.PUSHUPS: {
-      values = gender === 'male' ? points.pushupsMale : points.pushupsFemale;
-      break;
-    }
-    case TableType.SITUPS: {
-      values = gender === 'male' ? points.situpsMale : points.situpsFemale;
-      break;
-    }
-    case TableType.RUN: {
-      values = gender === 'male' ? points.runMale : points.runFemale;
-      break;
-    }
-  }
-
-  return <Stack direction='column' alignItems='center'>
-    <Stack direction='row' alignItems='center'>
-      <Typography>Male</Typography>
-      <Switch
-        checked={gender === 'female'}
-        onChange={() => setGender(gender === 'male' ? 'female' : 'male')}
-      />
-      <Typography>Female</Typography>
-    </Stack>
-    <Tabs onChange={(_, value) => setTableType(value)} value={tableType}>
-      <Tab value={TableType.PUSHUPS} label="Push Ups"/>
-      <Tab value={TableType.SITUPS} label="Sit Ups"/>
-      <Tab value={TableType.RUN} label="2.4 Run"/>
-    </Tabs>
-    {<TableDisplay values={values} />}
-  </Stack>;
+              return <TableCell
+                style={{
+                  textAlign: 'center',
+                  background: backgroundStr
+                }}
+              >
+                {value}
+              </TableCell>;
+            })}
+            </TableRow>)}
+          </TableBody>
+        </Table>
+      </Stack>
+    </div>
+  </Paper>;
 }
