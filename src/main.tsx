@@ -11,8 +11,8 @@ export default function MainComponent() {
     alignItems: 'center'
   }}>
     <Typography
-      component='h1'
-      fontSize={40}
+      variant='h1'
+      sx={{ fontSize: 40 }}
       color='white'
     >
       IPPT Calculator

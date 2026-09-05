@@ -1,5 +1,4 @@
-import capitalize from 'lodash/capitalize';
-import range from 'lodash/range';
+import { capitalize, range } from 'es-toolkit';
 import { useState } from 'react';
 
 import Paper from '@mui/material/Paper';
@@ -38,8 +37,8 @@ export default function TablesDisplay({
 
   return <Paper elevation={3}>
     <div style={{ padding: '10px' }}>
-      <Stack direction='column' alignItems='center' spacing={1}>
-        <Typography component='h2' fontSize={22}>
+      <Stack direction='column' sx={{ alignItems: 'center' }} spacing={1}>
+        <Typography variant='h2' sx={{ fontSize: 22 }}>
           Scoring Table ({capitalize(gender)})
         </Typography>
         <Tabs onChange={(_, value) => setTableType(value)} value={tableType}>

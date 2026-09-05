@@ -1,4 +1,4 @@
-import range from 'lodash/range';
+import { range } from 'es-toolkit';
 import { useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
@@ -174,14 +174,14 @@ export default function CalculatorDisplay() {
     <div style={{ padding: '10px' }}>
       <Grid container>
         <Grid size={12}>
-          <Stack direction='row' alignItems='center' spacing={1}>
+          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={1}>
             <AirlineSeatReclineExtraIcon />
-            <Typography component='h3' fontSize={25}>Sit-Ups</Typography>
+            <Typography variant='h3' sx={{ fontSize: 25 }}>Sit-Ups</Typography>
           </Stack>
         </Grid>
         <Grid size={12}>
-          <Stack direction='row' alignItems='center' spacing={0.5}>
-            <Typography fontSize={22}>{situps}</Typography>
+          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={0.5}>
+            <Typography sx={{ fontSize: 22 }}>{situps}</Typography>
             <Typography color='gray'>({situpScore} Points)</Typography>
           </Stack>
         </Grid>
@@ -232,14 +232,14 @@ export default function CalculatorDisplay() {
     <div style={{ padding: '10px' }}>
       <Grid container>
         <Grid size={12}>
-          <Stack direction='row' alignItems='center' spacing={1}>
+          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={1}>
             <FitnessCenterIcon />
-            <Typography component='h3' fontSize={25}>Push-Ups</Typography>
+            <Typography variant='h3' sx={{ fontSize: 25 }}>Push-Ups</Typography>
           </Stack>
         </Grid>
         <Grid size={12}>
-          <Stack direction='row' alignItems='center' spacing={0.5}>
-            <Typography fontSize={22}>{pushups}</Typography>
+          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={0.5}>
+            <Typography sx={{ fontSize: 22 }}>{pushups}</Typography>
             <Typography color='gray'>({pushupScore} Points)</Typography>
           </Stack>
         </Grid>
@@ -296,14 +296,14 @@ export default function CalculatorDisplay() {
     <div style={{ padding: '10px' }}>
       <Grid container>
         <Grid size={12}>
-          <Stack direction='row' alignItems='center' spacing={1}>
+          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={1}>
             <DirectionsRunIcon />
-            <Typography component='h3' fontSize={25}>2.4km Run</Typography>
+            <Typography variant='h3' sx={{ fontSize: 25 }}>2.4km Run</Typography>
           </Stack>
         </Grid>
         <Grid size={12}>
-          <Stack direction='row' alignItems='center' spacing={0.5}>
-            <Typography fontSize={22}>{runGroupStr}</Typography>
+          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={0.5}>
+            <Typography sx={{ fontSize: 22 }}>{runGroupStr}</Typography>
             <Typography color='gray'>({runScore} Points)</Typography>
           </Stack>
         </Grid>
@@ -358,18 +358,18 @@ export default function CalculatorDisplay() {
     <div style={{ padding: '15px' }}>
       <Grid
         container
-        textAlign='center'
-        rowGap={1}
+        // textAlign='center'
+        rowSpacing={1}
       >
         {/* row 1 */}
         <Grid size={4}>
-          <Typography fontSize={20}>Age (Age Group {ageGroup + 1})</Typography>
+          <Typography sx={{ fontSize: 20 }}>Age (Age Group {ageGroup + 1})</Typography>
         </Grid>
         <Grid size={4}>
-          <Typography fontSize={20}>Gender</Typography>
+          <Typography sx={{ fontSize: 20 }}>Gender</Typography>
         </Grid>
         <Grid size={4}>
-          <Typography fontSize={20}>Enhanced Mode</Typography>
+          <Typography sx={{ fontSize: 20 }}>Enhanced Mode</Typography>
         </Grid>
         {/* row 2 */}
         <Grid size={4}>
