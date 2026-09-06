@@ -1,4 +1,4 @@
-import { debounce, range } from 'es-toolkit';
+import { clamp, debounce, range } from 'es-toolkit';
 import { useCallback, useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
@@ -120,18 +120,18 @@ function useLocalStorage<T extends number | boolean | string>(initial: T, key: s
 }
 
 function usePoints(initial: number, key: points.TableType, ageGroup: number, table: points.AgeGroupRange[]) {
-  const [value, setValue] = useLocalStorage(initial, key);
+  const [storedValue, storeValue] = useLocalStorage(initial, key);
+  const value = clamp(storedValue, 0, table.length - 1);
   const score = points.getScore(table, ageGroup, value);
   const nextScore = points.findNextPoint(
     table,
     ageGroup,
-    value,
-    key === points.TableType.RUN
+    value
   );
 
   return {
     value,
-    setValue,
+    setValue: (nextValue: number) => storeValue(clamp(nextValue, 0, table.length - 1)),
     score,
     nextScore
   };
@@ -314,8 +314,8 @@ export default function CalculatorDisplay() {
         <Grid size={2}>
           <Tooltip title='-10s'>
             <Button
-              disabled={runScoreGroup === 0}
-              onClick={() => setRunScoreGroup(runScoreGroup - 1)}
+              disabled={runScoreGroup === runTable.length - 1}
+              onClick={() => setRunScoreGroup(runScoreGroup + 1)}
             >
               <RemoveIcon />
             </Button>
@@ -325,9 +325,9 @@ export default function CalculatorDisplay() {
           <Slider
             step={1}
             min={0}
-            max={runTable.length}
-            value={runScoreGroup}
-            onChange={(_, value) => setRunScoreGroup(value)}
+            max={runTable.length - 1}
+            value={runTable.length - 1 - runScoreGroup}
+            onChange={(_, value) => setRunScoreGroup(runTable.length - 1 - value)}
             marks={[{
               value: runTable.length - 1,
               label: `${maxRunMins}:${maxRunSecs}`
@@ -340,8 +340,8 @@ export default function CalculatorDisplay() {
         <Grid size={2}>
           <Tooltip title='+10s'>
             <Button
-              disabled={runScoreGroup === runTable.length - 1}
-              onClick={() => setRunScoreGroup(runScoreGroup + 1)}
+              disabled={runScoreGroup === 0}
+              onClick={() => setRunScoreGroup(runScoreGroup - 1)}
             >
               <AddIcon />
             </Button>
