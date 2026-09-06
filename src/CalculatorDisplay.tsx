@@ -1,12 +1,12 @@
-import { range } from 'es-toolkit';
-import { useState } from 'react';
+import { debounce, range } from 'es-toolkit';
+import { useCallback, useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
 import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-
 import RemoveIcon from '@mui/icons-material/Remove';
+
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -111,23 +111,27 @@ function IncentiveDisplay({ pushups, situps, run }: IncentiveDisplayProps) {
 function useLocalStorage<T extends number | boolean | string>(initial: T, key: string) {
   const storedValue = localStorage.getItem(key);
   const [value, setValue] = useState(storedValue !== null ? JSON.parse(storedValue) : initial);
+  const localSetter = useCallback(debounce(v => localStorage.setItem(key, JSON.stringify(v)), 200), [key]);
+
   return [value, v => {
     setValue(v);
-    localStorage.setItem(key, JSON.stringify(v));
+    localSetter(v);
   }] as [T, (v: T) => void];
 }
 
-function usePoints(initial: number, key: string, ageGroup: number, table: points.AgeGroupRange[]) {
+function usePoints(initial: number, key: points.TableType, ageGroup: number, table: points.AgeGroupRange[]) {
   const [value, setValue] = useLocalStorage(initial, key);
   const score = points.getScore(table, ageGroup, value);
-  const nextScore = points.findNextPoint(table, ageGroup, value);
+  const nextScore = points.findNextPoint(
+    table,
+    ageGroup,
+    value,
+    key === points.TableType.RUN
+  );
 
   return {
     value,
-    setValue: (newValue: number) => {
-      setValue(newValue);
-      localStorage.setItem(key, newValue.toString());
-    },
+    setValue,
     score,
     nextScore
   };
@@ -148,22 +152,22 @@ export default function CalculatorDisplay() {
     setValue: setPushups,
     score: pushupScore,
     nextScore: nextPushupScore
-  } = usePoints(30, 'pushups', ageGroup, pushupsTable);
+  } = usePoints(30, points.TableType.PUSHUPS, ageGroup, pushupsTable);
 
   const {
     value: situps,
     setValue: setSitups,
     score: situpScore,
     nextScore: nextSitupScore
-  } = usePoints(30, 'situps', ageGroup, situpsTable);
+  } = usePoints(30, points.TableType.SITUPS, ageGroup, situpsTable);
 
   const {
     value: runScoreGroup,
     setValue: setRunScoreGroup,
     score: runScore,
     nextScore: nextRunScoreGroup
-  } = usePoints(Math.floor(runTable.length) / 2, '2.4run', ageGroup, runTable);
-  const runGroupStr = points.runGroupToString(runTable.length - runScoreGroup, gender);
+  } = usePoints(Math.floor(runTable.length) / 2, points.TableType.RUN, ageGroup, runTable);
+  const runGroupStr = points.runGroupToString(runScoreGroup, gender);
 
   const {
     fastest: [minRunMins, minRunSecs],
@@ -310,8 +314,8 @@ export default function CalculatorDisplay() {
         <Grid size={2}>
           <Tooltip title='-10s'>
             <Button
-              disabled={runScoreGroup === runTable.length}
-              onClick={() => setRunScoreGroup(runScoreGroup + 1)}
+              disabled={runScoreGroup === 0}
+              onClick={() => setRunScoreGroup(runScoreGroup - 1)}
             >
               <RemoveIcon />
             </Button>
@@ -322,10 +326,10 @@ export default function CalculatorDisplay() {
             step={1}
             min={0}
             max={runTable.length}
-            value={runTable.length - runScoreGroup}
-            onChange={(_, value) => setRunScoreGroup(runTable.length - value)}
+            value={runScoreGroup}
+            onChange={(_, value) => setRunScoreGroup(value)}
             marks={[{
-              value: runTable.length,
+              value: runTable.length - 1,
               label: `${maxRunMins}:${maxRunSecs}`
             }, {
               value: 0,
@@ -336,8 +340,8 @@ export default function CalculatorDisplay() {
         <Grid size={2}>
           <Tooltip title='+10s'>
             <Button
-              disabled={runScoreGroup === 0}
-              onClick={() => setRunScoreGroup(runScoreGroup - 1)}
+              disabled={runScoreGroup === runTable.length - 1}
+              onClick={() => setRunScoreGroup(runScoreGroup + 1)}
             >
               <AddIcon />
             </Button>
@@ -358,7 +362,7 @@ export default function CalculatorDisplay() {
     <div style={{ padding: '15px' }}>
       <Grid
         container
-        // textAlign='center'
+        sx={{ textAlign: 'center' }}
         rowSpacing={1}
       >
         {/* row 1 */}
@@ -388,9 +392,7 @@ export default function CalculatorDisplay() {
                 value={age}
                 onChange={event => setAge(event.target.value)}
               >
-                {range(18, 61).map(i => <MenuItem value={i}>
-                  {i}
-                </MenuItem>)}
+                {range(18, 61).map(i => <MenuItem value={i}>{i}</MenuItem>)}
               </Select>
               <Button
                 disabled={age === 18}

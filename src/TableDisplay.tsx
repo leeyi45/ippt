@@ -56,31 +56,31 @@ export default function TablesDisplay({
                   {tableType === points.TableType.RUN ? 'Timing' : 'Reps'}
                 </Typography>
               </TableCell>
-            {...range(0, 14).map(group => {
-              let ageStr: string;
+              {...range(0, points.AGE_GROUPS).map(group => {
+                let ageStr: string;
 
-              if (group === 0) {
-                ageStr = ' <22';
-              } else {
-                const ageStrMin = 22 + (group - 1) * 3;
-                const ageStrMax = ageStrMin + 2;
-                ageStr = `${ageStrMin}-${ageStrMax}`;
-              }
+                if (group === 0) {
+                  ageStr = ' <22';
+                } else {
+                  const ageStrMin = 22 + (group - 1) * 3;
+                  const ageStrMax = ageStrMin + 2;
+                  ageStr = `${ageStrMin}-${ageStrMax}`;
+                }
 
-              return <TableCell style={{
-                backgroundColor: group === ageGroup ? '#EEEEFF' : '#FFFFFF',
-                textAlign: 'center'
-              }}>
-                <Tooltip
-                  title={`Age Group ${group + 1}`}
-                  placement='top'
-                >
-                  <Typography component='p'>
-                    {ageStr}
-                  </Typography>
-                </Tooltip>
-              </TableCell>;
-            })}
+                return <TableCell style={{
+                  backgroundColor: group === ageGroup ? '#EEEEFF' : '#FFFFFF',
+                  textAlign: 'center'
+                }}>
+                  <Tooltip
+                    title={`Age Group ${group + 1}`}
+                    placement='top'
+                  >
+                    <Typography component='p'>
+                      {ageStr}
+                    </Typography>
+                  </Tooltip>
+                </TableCell>;
+              })}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -88,7 +88,7 @@ export default function TablesDisplay({
               const isCorrectReps =
                 (tableType === points.TableType.PUSHUPS && i === pushupReps) ||
                 (tableType === points.TableType.SITUPS && i === situpReps) ||
-                (tableType === points.TableType.RUN && i === values.length - runScoreGroup);
+                (tableType === points.TableType.RUN && i === runScoreGroup);
 
               return <TableRow>
                 <TableCell

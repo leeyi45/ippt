@@ -248,10 +248,10 @@ const situpsFemale: TupleOfLength<53, AgeGroupRange> = [
   [24, 24, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25], // 49
   [24, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25], // 50
   [24, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25], // 51
-  [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25], // 51
+  [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25], // 52
 ];
 
-const runMale: TupleOfLength<60, AgeGroupRange> = [
+const runMaleSlowToFast: TupleOfLength<60, AgeGroupRange> = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 18.20
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2], // 18.10
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4], // 18.00
@@ -314,7 +314,7 @@ const runMale: TupleOfLength<60, AgeGroupRange> = [
   [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50], // 8.30
 ];
 
-const runFemale: TupleOfLength<71, AgeGroupRange> = [
+const runFemaleSlowToFast: TupleOfLength<71, AgeGroupRange> = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 6], // 21.40
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 6, 8], // 21.30
   [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 6, 8, 10], // 21.20
@@ -388,6 +388,9 @@ const runFemale: TupleOfLength<71, AgeGroupRange> = [
   [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50], // 10.00
 ];
 
+const runMale = [...runMaleSlowToFast].reverse();
+const runFemale = [...runFemaleSlowToFast].reverse();
+
 export const pointsTables = {
   [TableType.PUSHUPS]: {
     male: pushupsMale,
@@ -459,11 +462,23 @@ export function getScore(table: AgeGroupRange[], ageGroup: number, reps: number)
  * are required to reach the next point. Returns `undefined` if max score
  * was already achieved.
  */
-export function findNextPoint(table: AgeGroupRange[], ageGroup: number, reps: number): number | undefined {
+export function findNextPoint(
+  table: AgeGroupRange[],
+  ageGroup: number,
+  reps: number,
+  lowerIsBetter = false
+): number | undefined {
   const currentScore = getScore(table, ageGroup, reps);
-  for (let i = reps; i < table.length; i++) {
-    const newScore = table[i][ageGroup];
-    if (newScore > currentScore) return i - reps;
+  if (lowerIsBetter) {
+    for (let i = reps; i >= 0; i--) {
+      const newScore = table[i][ageGroup];
+      if (newScore > currentScore) return reps - i;
+    }
+  } else {
+    for (let i = reps; i < table.length; i++) {
+      const newScore = table[i][ageGroup];
+      if (newScore > currentScore) return i - reps;
+    }
   }
 
   return undefined;
