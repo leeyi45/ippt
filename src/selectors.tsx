@@ -13,7 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import type { PointsHookResult } from './hooks';
-import * as points from './points.js';
+import * as points from './points.ts';
 
 type BaseSelectorProps = {
   mainIcon: ReactNode;

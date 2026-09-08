@@ -1,6 +1,6 @@
 import { clamp, debounce } from 'es-toolkit';
 import { useCallback, useState } from 'react';
-import * as points from './points.js';
+import * as points from './points.ts';
 
 /**
  * Returns a stateful React value and setter that also loads from `localStorage`.

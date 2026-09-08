@@ -144,10 +144,10 @@ export default function CalculatorDisplay() {
           }}>
             <Stack direction='row'>
               <Button
-                disabled={age === 60}
-                onClick={() => setAge(age + 1)}
+                disabled={age === 18}
+                onClick={() => setAge(age - 1)}
               >
-                +1
+                -1
               </Button>
               <Select
                 value={age}
@@ -156,10 +156,10 @@ export default function CalculatorDisplay() {
                 {range(18, 61).map(i => <MenuItem value={i}>{i}</MenuItem>)}
               </Select>
               <Button
-                disabled={age === 18}
-                onClick={() => setAge(age - 1)}
+                disabled={age === 60}
+                onClick={() => setAge(age + 1)}
               >
-                -1
+                +1
               </Button>
             </Stack>
           </div>
@@ -232,6 +232,7 @@ export default function CalculatorDisplay() {
           situpReps={situps.reps}
           ageGroup={ageGroup}
           gender={gender}
+          onAgeChange={setAge}
         />
       </Grid>
     </Grid>
