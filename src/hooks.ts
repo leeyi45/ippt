@@ -34,7 +34,14 @@ export function isIntegerWithinRange(rawValue: unknown, max: number): rawValue i
   return 0 <= rawValue && rawValue < max;
 }
 
-export function usePoints(initial: number, key: points.TableType, ageGroup: number, table: points.AgeGroupRange[]) {
+export interface PointsHookResult {
+  reps: number;
+  setReps: (newValue: number) => void;
+  score: number;
+  nextScore: number | undefined;
+}
+
+export function usePoints(initial: number, key: points.TableType, ageGroup: number, table: points.AgeGroupRange[]): PointsHookResult {
   const [storedValue, storeValue] = useLocalStorage(initial, key, value => isIntegerWithinRange(value, table.length));
   const score = points.getScore(table, ageGroup, storedValue);
   const nextScore = points.findNextPoint(
@@ -44,8 +51,8 @@ export function usePoints(initial: number, key: points.TableType, ageGroup: numb
   );
 
   return {
-    value: storedValue,
-    setValue: (nextValue: number) => storeValue(clamp(nextValue, 0, table.length - 1)),
+    reps: storedValue,
+    setReps: nextValue => storeValue(clamp(nextValue, 0, table.length - 1)),
     score,
     nextScore
   };

@@ -1,11 +1,8 @@
 import { range } from 'es-toolkit';
 import { useState } from 'react';
 
-import AddIcon from '@mui/icons-material/Add';
 import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
-import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import RemoveIcon from '@mui/icons-material/Remove';
 
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -13,16 +10,15 @@ import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Select from '@mui/material/Select';
-import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import TablesDisplay from './TableDisplay.tsx';
 import { isIntegerWithinRange, useLocalStorage, usePoints } from './hooks.ts';
 import { passTypeToReward, passTypeToString, pointsToNextTier, pointsToPassType } from './passType.ts';
 import * as points from './points.ts';
+import { BaseSelector, RunSelector } from './selectors.tsx';
 
 interface IncentiveDisplayProps {
   pushups: number;
@@ -119,216 +115,9 @@ export default function CalculatorDisplay() {
   const situpsTable = points.pointsTables[points.TableType.SITUPS][gender];
   const runTable = points.pointsTables[points.TableType.RUN][gender];
 
-  const {
-    value: pushups,
-    setValue: setPushups,
-    score: pushupScore,
-    nextScore: nextPushupScore
-  } = usePoints(30, points.TableType.PUSHUPS, ageGroup, pushupsTable);
-
-  const {
-    value: situps,
-    setValue: setSitups,
-    score: situpScore,
-    nextScore: nextSitupScore
-  } = usePoints(30, points.TableType.SITUPS, ageGroup, situpsTable);
-
-  const {
-    value: runScoreGroup,
-    setValue: setRunScoreGroup,
-    score: runScore,
-    nextScore: nextRunScoreGroup
-  } = usePoints(Math.floor(runTable.length) / 2, points.TableType.RUN, ageGroup, runTable);
-  const runGroupStr = points.runGroupToString(runScoreGroup, gender);
-
-  const {
-    fastest: [minRunMins, minRunSecs],
-    slowest: [maxRunMins, maxRunSecs]
-  } = gender === 'male' ? points.runMaleLimits : points.runFemaleLimits;
-
-  const situpsSelector = <Paper elevation={3}>
-    <div style={{ padding: '10px' }}>
-      <Grid container>
-        <Grid size={12}>
-          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={1}>
-            <AirlineSeatReclineExtraIcon />
-            <Typography variant='h3' sx={{ fontSize: 25 }}>Sit-Ups</Typography>
-          </Stack>
-        </Grid>
-        <Grid size={12}>
-          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={0.5}>
-            <Typography sx={{ fontSize: 22 }}>{situps}</Typography>
-            <Typography color='gray'>({situpScore} Points)</Typography>
-          </Stack>
-        </Grid>
-        <Grid size={2}>
-          <Tooltip title='-1 Rep'>
-            <Button
-              disabled={situps === 0}
-              onClick={() => setSitups(situps + 1)}
-            >
-              <RemoveIcon />
-            </Button>
-          </Tooltip>
-        </Grid>
-        <Grid size={8}>
-          <Slider
-            step={1}
-            min={0}
-            max={60}
-            value={situps}
-            onChange={(_, value) => setSitups(value)}
-            marks={[{ value: 0, label: '0' }, { value: 60, label: '60' }]}
-          />
-        </Grid>
-        <Grid size={2}>
-          <Tooltip title='+1 Rep'>
-            <Button
-              disabled={situps === 60}
-              onClick={() => setSitups(situps + 1)}
-            >
-              <AddIcon />
-            </Button>
-          </Tooltip>
-        </Grid>
-        <Grid size={12}>
-          <Typography>
-            {
-              nextSitupScore !== undefined
-                ? <>{nextSitupScore} reps to next point</>
-                : <>Max Score</>
-            }
-          </Typography>
-        </Grid>
-      </Grid>
-    </div>
-  </Paper>;
-
-  const pushupsSelector = <Paper elevation={3}>
-    <div style={{ padding: '10px' }}>
-      <Grid container>
-        <Grid size={12}>
-          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={1}>
-            <FitnessCenterIcon />
-            <Typography variant='h3' sx={{ fontSize: 25 }}>Push-Ups</Typography>
-          </Stack>
-        </Grid>
-        <Grid size={12}>
-          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={0.5}>
-            <Typography sx={{ fontSize: 22 }}>{pushups}</Typography>
-            <Typography color='gray'>({pushupScore} Points)</Typography>
-          </Stack>
-        </Grid>
-        <Grid size={2}>
-          <Tooltip title='-1 Rep'>
-            <Button
-              disabled={pushups === 0}
-              onClick={() => setPushups(pushups - 1)}
-            >
-              <RemoveIcon />
-            </Button>
-          </Tooltip>
-        </Grid>
-        <Grid size={8}>
-          <Slider
-            step={1}
-            min={0}
-            max={60}
-            value={pushups}
-            onChange={(_, value) => setPushups(value)}
-            marks={[{ value: 0, label: '0' }, { value: 60, label: '60' }]}
-          />
-        </Grid>
-        <Grid size={2}>
-          <Tooltip title='+1 Rep'>
-            <Button
-              disabled={pushups === 60}
-              onClick={() => setPushups(pushups + 1)}
-            >
-              <AddIcon />
-            </Button>
-          </Tooltip>
-        </Grid>
-        <Grid size={12}>
-          <Typography>
-            {
-              nextPushupScore !== undefined
-                ? <>{nextPushupScore} reps to next point</>
-                : <>Max Score</>
-            }
-          </Typography>
-        </Grid>
-      </Grid>
-    </div>
-  </Paper>;
-
-  const runString = nextRunScoreGroup === undefined
-    ? undefined
-    : nextRunScoreGroup >= 6
-      ? `${Math.floor(nextRunScoreGroup / 6)}:${(nextRunScoreGroup % 6).toString()}0`
-      : `${(nextRunScoreGroup % 6).toString()}0s`;
-
-  const runSelector = <Paper elevation={3}>
-    <div style={{ padding: '10px' }}>
-      <Grid container>
-        <Grid size={12}>
-          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={1}>
-            <DirectionsRunIcon />
-            <Typography variant='h3' sx={{ fontSize: 25 }}>2.4km Run</Typography>
-          </Stack>
-        </Grid>
-        <Grid size={12}>
-          <Stack direction='row' sx={{ alignItems: 'center' }} spacing={0.5}>
-            <Typography sx={{ fontSize: 22 }}>{runGroupStr}</Typography>
-            <Typography color='gray'>({runScore} Points)</Typography>
-          </Stack>
-        </Grid>
-        <Grid size={2}>
-          <Tooltip title='-10s'>
-            <Button
-              disabled={runScoreGroup === runTable.length - 1}
-              onClick={() => setRunScoreGroup(runScoreGroup + 1)}
-            >
-              <RemoveIcon />
-            </Button>
-          </Tooltip>
-        </Grid>
-        <Grid size={8}>
-          <Slider
-            step={1}
-            min={0}
-            max={runTable.length - 1}
-            value={runTable.length - 1 - runScoreGroup}
-            onChange={(_, value) => setRunScoreGroup(runTable.length - 1 - value)}
-            marks={[{
-              value: runTable.length - 1,
-              label: `${maxRunMins}:${maxRunSecs}`
-            }, {
-              value: 0,
-              label: `${minRunMins}:${minRunSecs}`
-            }]}
-          />
-        </Grid>
-        <Grid size={2}>
-          <Tooltip title='+10s'>
-            <Button
-              disabled={runScoreGroup === 0}
-              onClick={() => setRunScoreGroup(runScoreGroup - 1)}
-            >
-              <AddIcon />
-            </Button>
-          </Tooltip>
-        </Grid>
-        <Typography>
-          {
-            runString !== undefined
-              ? <>-{runString} to next point</>
-              : <>Max Score</>
-          }
-        </Typography>
-      </Grid>
-    </div>
-  </Paper>;
+  const pushups = usePoints(30, points.TableType.PUSHUPS, ageGroup, pushupsTable);
+  const situps = usePoints(30, points.TableType.SITUPS, ageGroup, situpsTable);
+  const run = usePoints(Math.floor(runTable.length / 2), points.TableType.RUN, ageGroup, runTable);
 
   const settingsGrid = <Paper elevation={3}>
     <div style={{ padding: '15px' }}>
@@ -400,22 +189,47 @@ export default function CalculatorDisplay() {
       <Grid size={8}>{settingsGrid}</Grid>
       <Grid size={2} />
       {/* Row 2 */}
-      <Grid size={4}>{pushupsSelector}</Grid>
-      <Grid size={4}>{situpsSelector}</Grid>
-      <Grid size={4}>{runSelector}</Grid>
+      <Grid size={4}>
+        <BaseSelector
+          {...pushups}
+          label="Push-Ups"
+          maxReps={60}
+          mainIcon={<FitnessCenterIcon />}
+          incrementMessage='+1 Rep'
+          decrementMessage='-1 Rep'
+          nextScoreMessage={score => `${score} rep${score > 1 ? 's' : ''} to next point`}
+        />
+      </Grid>
+      <Grid size={4}>
+        <BaseSelector
+          {...situps}
+          label="Sit-Ups"
+          maxReps={60}
+          mainIcon={<AirlineSeatReclineExtraIcon />}
+          incrementMessage='+1 Rep'
+          decrementMessage='-1 Rep'
+          nextScoreMessage={score => `${score} rep${score > 1 ? 's' : ''} to next point`}
+        />
+      </Grid>
+      <Grid size={4}>
+        <RunSelector
+          {...run}
+          gender={gender}
+        />
+      </Grid>
       {/* Row 3 */}
       <Grid size={12}>
         <IncentiveDisplay
-          pushups={pushupScore}
-          situps={situpScore}
-          run={runScore}
+          pushups={pushups.score}
+          situps={situps.score}
+          run={run.score}
         />
       </Grid>
       <Grid size={12}>
         <TablesDisplay
-          runScoreGroup={runScoreGroup}
-          pushupReps={pushups}
-          situpReps={situps}
+          runScoreGroup={run.reps}
+          pushupReps={pushups.reps}
+          situpReps={situps.reps}
           ageGroup={ageGroup}
           gender={gender}
         />

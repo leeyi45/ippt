@@ -2846,7 +2846,6 @@ __metadata:
     "@emotion/styled": "npm:^11.14.1"
     "@mui/icons-material": "npm:^9.4.0"
     "@mui/material": "npm:^9.4.0"
-    "@mui/system": "npm:^9.4.0"
     "@mui/x-data-grid": "npm:^9.13.0"
     "@stylistic/eslint-plugin": "npm:^5.4.0"
     "@types/node": "npm:^22.15.30"

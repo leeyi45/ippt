@@ -26,7 +26,6 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.4.0",
     "@mui/material": "^9.4.0",
-    "@mui/system": "^9.4.0",
     "@mui/x-data-grid": "^9.13.0",
     "es-toolkit": "^1.52.0",
     "react": "^19.2.0",

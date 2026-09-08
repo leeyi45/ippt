@@ -40,8 +40,8 @@ describe(usePoints, () => {
     const table = points.pointsTables[points.TableType.PUSHUPS].female;
     const { result } = await renderHook(() => usePoints(14, points.TableType.PUSHUPS, 0, table));
 
-    result.current.setValue(1000);
+    result.current.setReps(1000);
 
-    await expect.poll(() => result.current.value).toBe(50);
+    await expect.poll(() => result.current.reps).toBe(50);
   });
 });
