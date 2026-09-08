@@ -7,6 +7,10 @@ export type AgeGroupRange = TupleOfLength<typeof AGE_GROUPS, number>;
 
 export type Gender = 'male' | 'female';
 
+export function isGender(rawValue: unknown): rawValue is Gender {
+  return rawValue === 'male' || rawValue === 'female';
+}
+
 export enum TableType {
   PUSHUPS = 'pushups',
   SITUPS = 'situps',

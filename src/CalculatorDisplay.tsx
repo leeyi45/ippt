@@ -1,5 +1,5 @@
-import { clamp, debounce, range } from 'es-toolkit';
-import { useCallback, useState } from 'react';
+import { range } from 'es-toolkit';
+import { useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
 import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
@@ -20,6 +20,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import TablesDisplay from './TableDisplay.tsx';
+import { isIntegerWithinRange, useLocalStorage, usePoints } from './hooks.ts';
 import { passTypeToReward, passTypeToString, pointsToNextTier, pointsToPassType } from './passType.ts';
 import * as points from './points.ts';
 
@@ -108,41 +109,12 @@ function IncentiveDisplay({ pushups, situps, run }: IncentiveDisplayProps) {
   </Paper>;
 }
 
-function useLocalStorage<T extends number | boolean | string>(initial: T, key: string) {
-  const storedValue = localStorage.getItem(key);
-  const [value, setValue] = useState(storedValue !== null ? JSON.parse(storedValue) : initial);
-  const localSetter = useCallback(debounce(v => localStorage.setItem(key, JSON.stringify(v)), 200), [key]);
-
-  return [value, v => {
-    setValue(v);
-    localSetter(v);
-  }] as [T, (v: T) => void];
-}
-
-function usePoints(initial: number, key: points.TableType, ageGroup: number, table: points.AgeGroupRange[]) {
-  const [storedValue, storeValue] = useLocalStorage(initial, key);
-  const value = clamp(storedValue, 0, table.length - 1);
-  const score = points.getScore(table, ageGroup, value);
-  const nextScore = points.findNextPoint(
-    table,
-    ageGroup,
-    value
-  );
-
-  return {
-    value,
-    setValue: (nextValue: number) => storeValue(clamp(nextValue, 0, table.length - 1)),
-    score,
-    nextScore
-  };
-}
-
 export default function CalculatorDisplay() {
-  const [age, setAge] = useLocalStorage<number>(18, 'age');
+  const [age, setAge] = useLocalStorage<number>(18, 'age', value => isIntegerWithinRange(value - 18, 43));
   const ageGroup = points.getAgeGroup(age);
 
   const [isEnhanced, setEnhanced] = useState(false);
-  const [gender, setGender] = useLocalStorage<points.Gender>('male', 'gender');
+  const [gender, setGender] = useLocalStorage<points.Gender>('male', 'gender', points.isGender);
   const pushupsTable = points.pointsTables[points.TableType.PUSHUPS][gender];
   const situpsTable = points.pointsTables[points.TableType.SITUPS][gender];
   const runTable = points.pointsTables[points.TableType.RUN][gender];
@@ -411,6 +383,8 @@ export default function CalculatorDisplay() {
         </Grid>
         <Grid size={4}>
           <Switch
+            /* re-enable when enhanced mode is released */
+            disabled
             value={isEnhanced}
             onChange={() => setEnhanced(!isEnhanced)}
           />

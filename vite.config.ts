@@ -1,6 +1,7 @@
 import reactPlugin from '@vitejs/plugin-react';
 import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
+import { playwright } from '@vitest/browser-playwright';
 
 export default defineConfig(({ mode } ) => {
   const env = loadEnv(mode, process.cwd());
@@ -11,11 +12,28 @@ export default defineConfig(({ mode } ) => {
       'process.env': env
     },
     test: {
-      name: 'IPPT',
-      clearMocks: true,
-      include: [
-        'src/**/__tests__/*.test.ts',
-        'src/**/__tests__/*.test.tsx',
+      projects: [
+        {
+          test: {
+            name: 'Other Tests',
+            include: ['src/**/__tests__/**/*.test.ts'],
+          },
+        },
+        {
+          test: {
+            name: 'Browser Tests',
+            include: [
+              'src/**/__tests__/**/*.test.tsx',
+            ],
+            browser: {
+              enabled: true,
+              headless: true,
+              provider: playwright(),
+              instances: [{ browser: 'chromium' }],
+              screenshotFailures: false
+            }
+          }
+        }
       ],
       silent: 'passed-only',
       watch: false,
