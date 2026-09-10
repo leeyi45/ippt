@@ -1,10 +1,6 @@
 import { capitalize, range } from 'es-toolkit';
 import { useState } from 'react';
 
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-
-import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Tab from '@mui/material/Tab';
@@ -21,24 +17,11 @@ import type { Gender } from './points.ts';
 import * as points from './points.ts';
 
 interface AgeGroupCellProps {
-  enableIncrement?: boolean;
-  enableDecrement?: boolean;
-
-  onIncrement?: () => void;
-  onDecrement?: () => void;
-
   selected?: boolean;
   group: number;
 }
 
-function AgeGroupCell({
-  enableDecrement,
-  enableIncrement,
-  onDecrement,
-  onIncrement,
-  group,
-  selected
-}: AgeGroupCellProps) {
+function AgeGroupCell({ group, selected }: AgeGroupCellProps) {
   let ageStr: string;
 
   if (group === 0) {
@@ -58,28 +41,9 @@ function AgeGroupCell({
       title={`Age Group ${group + 1}`}
       placement='top'
     >
-      <Stack direction='row' sx={{
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        {selected && <IconButton
-          onClick={onDecrement}
-          disabled={!enableDecrement}
-          size='small'
-        >
-          <KeyboardArrowLeftIcon />
-        </IconButton>}
-        <Typography component='p' sx={{ textAlign: 'center' }}>
-          {ageStr}
-        </Typography>
-        {selected && <IconButton
-          onClick={onIncrement}
-          disabled={!enableIncrement}
-          size='small'
-        >
-          <KeyboardArrowRightIcon />
-        </IconButton>}
-      </Stack>
+      <Typography component='p' sx={{ textAlign: 'center' }}>
+        {ageStr}
+      </Typography>
     </Tooltip>
   </TableCell>;
 }
@@ -90,13 +54,10 @@ export interface TablesDisplayProps {
   situpReps: number;
   ageGroup: number;
   gender: Gender;
-
-  onAgeChange?: (newAge: number) => void;
 }
 
 export default function TablesDisplay({
   ageGroup,
-  onAgeChange,
   pushupReps,
   situpReps,
   runScoreGroup,
@@ -128,18 +89,8 @@ export default function TablesDisplay({
               </TableCell>
               {...range(0, points.AGE_GROUPS).map(group => {
                 return <AgeGroupCell
-                  enableDecrement={group > 0}
-                  enableIncrement={group < points.AGE_GROUPS - 1}
                   group={group}
                   selected={group === ageGroup}
-                  onIncrement={() => {
-                    const newAge = 22 + group * 3;
-                    onAgeChange?.(newAge);
-                  }}
-                  onDecrement={() => {
-                    const newAge = 22 + (group - 2) * 3 + 2;
-                    onAgeChange?.(newAge);
-                  }}
                 />;
               })}
             </TableRow>

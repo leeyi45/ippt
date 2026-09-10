@@ -1,5 +1,5 @@
 import { range } from 'es-toolkit';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
@@ -119,6 +119,10 @@ export default function CalculatorDisplay() {
   const situps = usePoints(30, points.TableType.SITUPS, ageGroup, situpsTable);
   const run = usePoints(Math.floor(runTable.length / 2), points.TableType.RUN, ageGroup, runTable);
 
+  useEffect(() => {
+    console.log(run.reps);
+  }, [run.reps]);
+
   const settingsGrid = <Paper elevation={3}>
     <div style={{ padding: '15px' }}>
       <Grid
@@ -232,7 +236,6 @@ export default function CalculatorDisplay() {
           situpReps={situps.reps}
           ageGroup={ageGroup}
           gender={gender}
-          onAgeChange={setAge}
         />
       </Grid>
     </Grid>

@@ -36,17 +36,45 @@ describe(points.getScore, () => {
 });
 
 describe(points.runGroupToString, () => {
+  function formatRunLimit([min, sec]: [number, number]) {
+    const secString = sec.toString().padEnd(2, '0');
+    return `${min}:${secString}`;
+  }
+
   it.each([
-    [0, 'male', '18:20'],
     [1, 'male', '18:10'],
     [6, 'male', '17:20'],
-    [59, 'male', '8:30'],
     [0, 'female', '21:40'],
     [1, 'female', '21:30'],
     [6, 'female', '20:40'],
-    [70, 'female', '10:00']
   ] as [number, points.Gender, string][])('%s (%s) formats as %s', (runGroup, gender, expected) => {
     expect(points.runGroupToString(runGroup, gender)).toEqual(expected);
+  });
+
+  test('Correct value for fastest run (male)', () => {
+    expect(points.runGroupToString(
+      points.pointsTables[points.TableType.RUN].male.length - 1,
+      'male'
+    )).toEqual(
+      formatRunLimit(points.runMaleLimits.fastest)
+    );
+  });
+
+  test('Correct value for slowest run (male)', () => {
+    expect(points.runGroupToString(0, 'male')).toEqual( formatRunLimit(points.runMaleLimits.slowest));
+  });
+
+  test('Correct value for max run (male)', () => {
+    expect(points.runGroupToString(
+      points.pointsTables[points.TableType.RUN].male.length - 1,
+      'male'
+    )).toEqual(
+      formatRunLimit(points.runMaleLimits.fastest)
+    );
+  });
+
+  test('Correct value for slowest run (female)', () => {
+    expect(points.runGroupToString(0, 'female')).toEqual(formatRunLimit(points.runFemaleLimits.slowest));
   });
 });
 

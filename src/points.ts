@@ -413,7 +413,7 @@ export interface RunLimits {
 }
 
 export const runMaleLimits: RunLimits = {
-  fastest: [8, 20],
+  fastest: [8, 30],
   slowest: [18, 20]
 };
 
