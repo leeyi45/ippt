@@ -29,16 +29,16 @@ describe(useLocalStorage, () => {
 
 describe(usePoints, () => {
   it('returns the score and next-point distance', async () => {
-    const table = points.pointsTables[points.TableType.PUSHUPS].female;
-    const { result } = await renderHook(() => usePoints(14, points.TableType.PUSHUPS, 0, table));
+    const table = points.pointsTables.pushups.female;
+    const { result } = await renderHook(() => usePoints(14, 'pushups', 0, table));
 
     expect(result.current.score).toBe(0);
     expect(result.current.nextScore).toBe(1);
   });
 
   it('clamps values set outside the table range', async () => {
-    const table = points.pointsTables[points.TableType.PUSHUPS].female;
-    const { result } = await renderHook(() => usePoints(14, points.TableType.PUSHUPS, 0, table));
+    const table = points.pointsTables.pushups.female;
+    const { result } = await renderHook(() => usePoints(14, 'pushups', 0, table));
 
     result.current.setReps(1000);
 

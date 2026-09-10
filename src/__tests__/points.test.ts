@@ -31,7 +31,7 @@ describe('Test point tables', () => {
 
 describe(points.getScore, () => {
   it('returns max score if reps ≥ max', () => {
-    expect(points.getScore(points.pointsTables[points.TableType.PUSHUPS].male, 0, 1000)).toEqual(25);
+    expect(points.getScore(points.pointsTables.pushups.male, 0, 1000)).toEqual(25);
   });
 });
 
@@ -53,7 +53,7 @@ describe(points.runGroupToString, () => {
 
   test('Correct value for fastest run (male)', () => {
     expect(points.runGroupToString(
-      points.pointsTables[points.TableType.RUN].male.length - 1,
+      points.pointsTables.run.male.length - 1,
       'male'
     )).toEqual(
       formatRunLimit(points.runMaleLimits.fastest)
@@ -66,7 +66,7 @@ describe(points.runGroupToString, () => {
 
   test('Correct value for max run (male)', () => {
     expect(points.runGroupToString(
-      points.pointsTables[points.TableType.RUN].male.length - 1,
+      points.pointsTables.run.male.length - 1,
       'male'
     )).toEqual(
       formatRunLimit(points.runMaleLimits.fastest)
@@ -79,7 +79,7 @@ describe(points.runGroupToString, () => {
 });
 
 describe(points.findNextPoint, () => {
-  const table = points.pointsTables[points.TableType.PUSHUPS].female;
+  const table = points.pointsTables.pushups.female;
 
   it('finds the next point', () => {
     expect(points.findNextPoint(table, 0, 14)).toEqual(1);

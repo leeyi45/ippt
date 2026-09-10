@@ -111,13 +111,13 @@ export default function CalculatorDisplay() {
 
   const [isEnhanced, setEnhanced] = useState(false);
   const [gender, setGender] = useLocalStorage<points.Gender>('male', 'gender', points.isGender);
-  const pushupsTable = points.pointsTables[points.TableType.PUSHUPS][gender];
-  const situpsTable = points.pointsTables[points.TableType.SITUPS][gender];
-  const runTable = points.pointsTables[points.TableType.RUN][gender];
+  const pushupsTable = points.pointsTables.pushups[gender];
+  const situpsTable = points.pointsTables.situps[gender];
+  const runTable = points.pointsTables.run[gender];
 
-  const pushups = usePoints(30, points.TableType.PUSHUPS, ageGroup, pushupsTable);
-  const situps = usePoints(30, points.TableType.SITUPS, ageGroup, situpsTable);
-  const run = usePoints(Math.floor(runTable.length / 2), points.TableType.RUN, ageGroup, runTable);
+  const pushups = usePoints(30, 'pushups', ageGroup, pushupsTable);
+  const situps = usePoints(30, 'situps', ageGroup, situpsTable);
+  const run = usePoints(Math.floor(runTable.length / 2), 'run', ageGroup, runTable);
 
   useEffect(() => {
     console.log(run.reps);

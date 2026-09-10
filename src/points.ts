@@ -11,11 +11,7 @@ export function isGender(rawValue: unknown): rawValue is Gender {
   return rawValue === 'male' || rawValue === 'female';
 }
 
-export enum TableType {
-  PUSHUPS = 'pushups',
-  SITUPS = 'situps',
-  RUN = 'run'
-}
+export type TableType = 'pushups' | 'situps' | 'run';
 
 const pushupsMale: TupleOfLength<61, AgeGroupRange> = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 0
@@ -393,15 +389,15 @@ const runFemale: TupleOfLength<71, AgeGroupRange> = [
 ];
 
 export const pointsTables = {
-  [TableType.PUSHUPS]: {
+  pushups: {
     male: pushupsMale,
     female: pushupsFemale
   },
-  [TableType.SITUPS]: {
+  situps: {
     male: situpsMale,
     female: situpsFemale
   },
-  [TableType.RUN]: {
+  run: {
     male: runMale,
     female: runFemale
   }

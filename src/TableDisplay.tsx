@@ -63,7 +63,7 @@ export default function TablesDisplay({
   runScoreGroup,
   gender
 }: TablesDisplayProps) {
-  const [tableType, setTableType] = useState<points.TableType>(points.TableType.PUSHUPS);
+  const [tableType, setTableType] = useState<points.TableType>('pushups');
   const values = points.pointsTables[tableType][gender];
 
   return <Paper elevation={3}>
@@ -73,9 +73,9 @@ export default function TablesDisplay({
           Scoring Table ({capitalize(gender)})
         </Typography>
         <Tabs onChange={(_, value) => setTableType(value)} value={tableType}>
-          <Tab value={points.TableType.PUSHUPS} label="Push Ups"/>
-          <Tab value={points.TableType.SITUPS} label="Sit Ups"/>
-          <Tab value={points.TableType.RUN} label="2.4 Run"/>
+          <Tab value='pushups' label="Push Ups"/>
+          <Tab value='situps' label="Sit Ups"/>
+          <Tab value='run' label="2.4 Run"/>
         </Tabs>
         <Table style={{
           border: 'solid black 1px'
@@ -84,7 +84,7 @@ export default function TablesDisplay({
             <TableRow>
               <TableCell>
                 <Typography component='p'>
-                  {tableType === points.TableType.RUN ? 'Timing' : 'Reps'}
+                  {tableType === 'run' ? 'Timing' : 'Reps'}
                 </Typography>
               </TableCell>
               {...range(0, points.AGE_GROUPS).map(group => {
@@ -98,9 +98,9 @@ export default function TablesDisplay({
           <TableBody>
             {values.map((row, i) => {
               const isCorrectReps =
-                (tableType === points.TableType.PUSHUPS && i === pushupReps) ||
-                (tableType === points.TableType.SITUPS && i === situpReps) ||
-                (tableType === points.TableType.RUN && i === runScoreGroup);
+                (tableType === 'pushups' && i === pushupReps) ||
+                (tableType === 'situps' && i === situpReps) ||
+                (tableType === 'run' && i === runScoreGroup);
 
               return <TableRow>
                 <TableCell
@@ -110,7 +110,7 @@ export default function TablesDisplay({
                   }}
                 >
                   <strong>
-                    {tableType === points.TableType.RUN ? points.runGroupToString(i, gender) : `${i}`}
+                    {tableType === 'run' ? points.runGroupToString(i, gender) : `${i}`}
                   </strong>
                 </TableCell>
                 {...row.map((value, rowAge) => {

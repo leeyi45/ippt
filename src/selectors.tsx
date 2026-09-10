@@ -122,7 +122,7 @@ export function RunSelector({
     slowest: [maxRunMins, maxRunSecs]
   } = gender === 'male' ? points.runMaleLimits : points.runFemaleLimits;
 
-  const maxRunScoreGroup = points.pointsTables[points.TableType.RUN][gender].length - 1;
+  const maxRunScoreGroup = points.pointsTables.run[gender].length - 1;
 
   return <BaseSelector
     {...props}
