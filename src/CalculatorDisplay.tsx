@@ -1,5 +1,5 @@
 import { range } from 'es-toolkit';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
@@ -118,10 +118,6 @@ export default function CalculatorDisplay() {
   const pushups = usePoints(30, 'pushups', ageGroup, pushupsTable);
   const situps = usePoints(30, 'situps', ageGroup, situpsTable);
   const run = usePoints(Math.floor(runTable.length / 2), 'run', ageGroup, runTable);
-
-  useEffect(() => {
-    console.log(run.reps);
-  }, [run.reps]);
 
   const settingsGrid = <Paper elevation={3}>
     <div style={{ padding: '15px' }}>
