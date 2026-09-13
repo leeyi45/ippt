@@ -73,7 +73,7 @@ export function BaseSelector({
           <Tooltip title={decrementMessage}>
             <Button
               disabled={reps === 0}
-              onClick={() => onRepsChanged?.(reps + 1)}
+              onClick={() => onRepsChanged?.(reps - 1)}
             >
               <RemoveIcon />
             </Button>
