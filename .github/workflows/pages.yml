@@ -43,7 +43,7 @@ jobs:
           cache: yarn
 
       - name: Install Packages
-        run: yarn install --immutable --immutable-cache
+        run: yarn install --immutable
 
       - name: Build
         run: yarn build
