@@ -31,9 +31,14 @@
     "react-dom": "^19.2.0"
   },
   "scripts": {
+    "build": "vite build",
     "dev": "vite dev",
     "lint": "eslint --concurrency=auto",
     "test": "vitest",
     "test:browser": "vitest --project 'Browser Tests'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leeyi45/ippt"
   }
 }

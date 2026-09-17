@@ -84,7 +84,9 @@ export default function TablesDisplay({
             <TableRow>
               <TableCell>
                 <Typography component='p'>
-                  {tableType === 'run' ? 'Timing' : 'Reps'}
+                  <strong>
+                    {tableType === 'run' ? 'Timing' : 'Reps'}
+                  </strong>
                 </Typography>
               </TableCell>
               {...range(0, points.AGE_GROUPS).map(group => {

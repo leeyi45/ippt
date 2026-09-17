@@ -2,6 +2,7 @@ import { range } from 'es-toolkit';
 import { useState } from 'react';
 
 import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 
 import Button from '@mui/material/Button';
@@ -12,6 +13,7 @@ import Paper from '@mui/material/Paper';
 import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import TablesDisplay from './TableDisplay.tsx';
@@ -62,19 +64,27 @@ function IncentiveDisplay({ pushups, situps, run }: IncentiveDisplayProps) {
       <Grid container>
         {/* Row 1 */}
         <Grid size={2}>
-          <Typography component='h2'>Total Points</Typography>
+          <Typography component='h2'>
+            <strong>Total Points</strong>
+          </Typography>
         </Grid>
         <Grid size={8} />
         <Grid size={2}>
-          <Typography component='h2' align='right'>Award</Typography>
+          <Typography component='h2' align='right'>
+            <strong>Award</strong>
+          </Typography>
         </Grid>
         {/* Row 2 */}
         <Grid size={2}>
-          <Typography component='h3'>{points}</Typography>
+          <Typography component='h3'>
+            <strong>{points}</strong>
+          </Typography>
         </Grid>
         <Grid size={8} />
         <Grid size={2}>
-          <Typography align='right'>{passTypeToString(type)}</Typography>
+          <Typography align='right'>
+            <strong>{passTypeToString(type)}</strong>
+          </Typography>
         </Grid>
         {/* Row 3 */}
         <Grid size={12}>
@@ -120,7 +130,7 @@ export default function CalculatorDisplay() {
   const run = usePoints(Math.floor(runTable.length / 2), 'run', ageGroup, runTable);
 
   const settingsGrid = <Paper elevation={3}>
-    <div style={{ padding: '15px' }}>
+    <div style={{ padding: '15px' }} id="back-to-top-anchor">
       <Grid
         container
         sx={{ textAlign: 'center' }}
@@ -171,12 +181,16 @@ export default function CalculatorDisplay() {
           </Select>
         </Grid>
         <Grid size={4}>
-          <Switch
-            /* re-enable when enhanced mode is released */
-            disabled
-            value={isEnhanced}
-            onChange={() => setEnhanced(!isEnhanced)}
-          />
+          <Tooltip title="Coming Soon">
+            <span>
+              <Switch
+                /* re-enable when enhanced mode is released */
+                disabled
+                value={isEnhanced}
+                onChange={() => setEnhanced(!isEnhanced)}
+              />
+            </span>
+          </Tooltip>
         </Grid>
       </Grid>
     </div>
@@ -233,6 +247,30 @@ export default function CalculatorDisplay() {
           ageGroup={ageGroup}
           gender={gender}
         />
+      </Grid>
+      <Grid size={1}>
+        <Paper>
+          <Button
+            onClick={() => {
+              const anchor = document.querySelector(
+                '#back-to-top-anchor',
+              );
+
+              if (anchor) {
+                anchor.scrollIntoView({
+                  block: 'center',
+                  behavior: 'smooth', // Enables smooth animation
+                });
+              } else {
+              // Fallback if no anchor is set
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            variant='outlined'
+            startIcon={<ArrowUpwardIcon />}>
+            Go to Top
+          </Button>
+        </Paper>
       </Grid>
     </Grid>
   </div>;
